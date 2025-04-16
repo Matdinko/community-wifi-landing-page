@@ -92,7 +92,7 @@
     </header>
 
     <div class="signup-form">
-      <form id="waitlistForm" data-netlify="true">
+      <form id="waitlistForm" method="POST" data-netlify="true">
         <div class="form-group">
           <label for="name">Name (optional)</label>
           <input type="text" id="name" placeholder="Your name">
@@ -148,20 +148,32 @@
 
   <script>
     document.getElementById('waitlistForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-
+      e.preventDefault(); // Keep this to prevent default submission
+      
+      // Optional: You can keep this validation if you want
       const name = document.getElementById('name').value;
       const contact = document.getElementById('contact').value;
       const area = document.getElementById('area').value;
-
       console.log('Submitted:', { name, contact, area });
 
-      alert('Thanks for joining! We\'ll contact you soon.');
-      this.reset();
+      // Submit to Netlify
+      fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(new FormData(e.target)).toString(),
+      })
+      .then(() => {
+        alert('Thanks for joining! We\'ll contact you soon.');
+        e.target.reset();
 
-      const counter = document.querySelector('.counter');
-      const currentCount = parseInt(counter.textContent.match(/\d+/)[0]);
-      counter.textContent = `Already ${currentCount + 1} people in Greater Accra Region joined!`;
+        const counter = document.querySelector('.counter');
+        const currentCount = parseInt(counter.textContent.match(/\d+/)[0]);
+        counter.textContent = `Already ${currentCount + 1} people in Greater Accra Region joined!`;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Oops! Something went wrong. Please try again.');
+      });
     });
   </script>
 </body>
